@@ -16,8 +16,32 @@ const init = async () => {
     method: "GET",
     path: "/",
     handler: async (request, h) => {
-      const allUsers = await prisma.user.findMany();
-      console.log(allUsers);
+
+
+      await prisma.user.create({
+        data: {
+          name: 'Aliedddeece',
+          email: 'bonj@prisma.io',
+          posts: {
+            create: { title: 'Hello World' },
+          },
+          profile: {
+            create: { bio: 'I like turtles' },
+          },
+        },
+      })
+    
+      const allUsers = await prisma.user.findMany({
+        include: {
+          posts: true,
+          profile: true,
+        },
+      })
+      console.dir(allUsers, { depth: null })
+      console.log("log",allUsers, { depth: null });
+
+
+
       return "Hello World!";
     },
   });
@@ -33,6 +57,7 @@ process.on("unhandledRejection", (err) => {
 
 init()
 .catch((e) => {
+  console.log(e);
   throw e
 })
 .finally(async () => {
