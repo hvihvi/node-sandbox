@@ -1,6 +1,10 @@
 "use strict";
 
 const Hapi = require("@hapi/hapi");
+const {PrismaClient}=require('@prisma/client');
+
+const prisma = new PrismaClient();
+
 
 const init = async () => {
   const server = Hapi.server({
@@ -11,7 +15,9 @@ const init = async () => {
   server.route({
     method: "GET",
     path: "/",
-    handler: (request, h) => {
+    handler: async (request, h) => {
+      const allUsers = await prisma.user.findMany();
+      console.log(allUsers);
       return "Hello World!";
     },
   });
@@ -25,4 +31,10 @@ process.on("unhandledRejection", (err) => {
   process.exit(1);
 });
 
-init();
+init()
+.catch((e) => {
+  throw e
+})
+.finally(async () => {
+  await prisma.$disconnect()
+});
